@@ -23,8 +23,11 @@ public class AccountController {
         return accountRepository.findAll().stream().map(AccountDTO::new).collect(toList());
     }
 
-    @GetMapping(value = "/accounts/{id}")
+     @GetMapping(value = "/accounts/{id}")
     public AccountDTO getAccountById(@PathVariable Long id){
         return accountRepository.findById(id).map(AccountDTO::new).orElse(null);
     }
+
+    
+
 }

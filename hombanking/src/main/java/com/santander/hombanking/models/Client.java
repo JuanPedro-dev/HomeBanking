@@ -70,7 +70,13 @@ public class Client {
     }
 
    //@JsonIgnore
-    public Set<Loan> getClientLoans() {
+
+    public Set<ClientLoan> getClientLoans() {
+        return clientLoans;
+    }
+
+    // Agrego porque asi esta en el tutorial por si lo usamos luego
+    public Set<Loan> getLoans() {
         return clientLoans.stream().map(clientLoan -> clientLoan.getLoan()).collect(Collectors.toSet());
     }
 

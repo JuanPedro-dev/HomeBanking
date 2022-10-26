@@ -36,7 +36,7 @@ public class ClientLoan {
         this.loan = loan;
     }
 
-    // Getters And Setters
+    // Getters And Setters (los Setter no son necesario porque esta clase es para ver como se enlazan)
     public long getId() {
         return id;
     }

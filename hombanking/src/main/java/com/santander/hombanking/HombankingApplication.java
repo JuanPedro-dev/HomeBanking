@@ -54,7 +54,7 @@ public class HombankingApplication {
 			account_1.addTransaction(transaction1);
 			account_1.addTransaction(transaction2);
 
-			// Creo un
+			// Creo una instancia de la tabla con cliente, pretamos con cantidad y coutas...
 
 
 			// Guardo los valores en la BBDD
