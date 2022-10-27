@@ -2,25 +2,46 @@ var app = new Vue({
     el:"#app",
     data:{
         clientInfo: {},
-        error: null
+        errorToats: null,
+        errorMsg: null,
     },
     methods:{
         getData: function(){
             axios.get("/api/clients/1")
-            .then(function (response) {
+            .then((response) => {
                 //get client ifo
-                app.clientInfo = response.data;
+                this.clientInfo = response.data;
+                console.log(this.clientInfo);
             })
-            .catch(function (error) {
+            .catch((error)=>{
                 // handle error
-                app.error = error;
+                console.log("estoy en el catch");
+                this.errorMsg = "Error getting data";
+                this.errorToats.show();
             })
         },
         formatDate: function(date){
             return new Date(date).toLocaleDateString('en-gb');
+        },
+        signOut: function(){
+            axios.post('/api/logout')
+            .then(response => window.location.href="/web/index.html")
+            .catch(() =>{
+                this.errorMsg = "Sign out failed"   
+                this.errorToats.show();
+            })
+        },
+        create: function(){
+            axios.post('http://localhost:8080/api/clients/current/accounts')
+            .then(response => window.location.reload())
+            .catch((error) =>{
+                this.errorMsg = error.response.data;  
+                this.errorToats.show();
+            })
         }
     },
     mounted: function(){
+        this.errorToats = new bootstrap.Toast(document.getElementById('danger-toast'));
         this.getData();
     }
 })

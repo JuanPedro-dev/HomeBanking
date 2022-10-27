@@ -18,19 +18,25 @@ public class Client {
     @Column(name="last_name")
     private String lastName;
     private String email;
+    private String password;
+
     @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
     private Set<Account> accounts = new HashSet<>();
 
     @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
     private Set<ClientLoan> clientLoans = new HashSet<>();
 
+    @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
+    private Set<Card> cards = new HashSet<>();
+
     public Client() {
     }
 
-    public Client(String firstName, String lastName, String email) {
+    public Client(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.password = password;
     }
     public String getFirstName() {
         return firstName;
@@ -89,4 +95,24 @@ public class Client {
         clientLoans.add(clientLoan);
     }
 
+    public Set<Card> getCards() {
+        return cards;
+    }
+    public void setCards(Set<Card> cards) {
+        this.cards = cards;
+    }
+
+    public void addCard(Card card){
+        card.setClient(this);
+        cards.add(card);
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

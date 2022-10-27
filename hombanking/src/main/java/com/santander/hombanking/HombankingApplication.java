@@ -1,17 +1,18 @@
 package com.santander.hombanking;
 
-import com.santander.hombanking.models.Account;
-import com.santander.hombanking.models.Client;
-import com.santander.hombanking.models.Transaction;
-import com.santander.hombanking.models.TransactionType;
+import com.santander.hombanking.models.*;
 import com.santander.hombanking.repositories.AccountRepository;
+import com.santander.hombanking.repositories.CardRepository;
 import com.santander.hombanking.repositories.ClientRepository;
 import com.santander.hombanking.repositories.TransactionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @SpringBootApplication
@@ -21,8 +22,11 @@ public class HombankingApplication {
 		SpringApplication.run(HombankingApplication.class, args);
 	}
 	LocalDateTime localDate = LocalDateTime.now();
+	@Autowired
+	PasswordEncoder passwordEncoder;
+
 	@Bean
-	public CommandLineRunner initData(ClientRepository clientRepository, AccountRepository accountRepository, TransactionRepository transactionRepository) {
+	public CommandLineRunner initData(ClientRepository clientRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, CardRepository cardRepository) {
 		return (args) -> {
 			/** Modelo de relación:
 				Cliente 1:
@@ -31,11 +35,14 @@ public class HombankingApplication {
 			                         transaccion 1
 			                         transaccion 2
 			                  cuenta 2
+			 			Tarjetas:
 
 
 			*/
+
+
 			// Creo un cliente
-			Client client_1 = new Client("Melba_manual", "Morel", "melba@mindhub.com");
+			Client client_1 = new Client("Melba_manual", "Morel", "melba@mindhub.com", passwordEncoder.encode("clave123"));
 
 			// Creo una cuenta, y le digo de qué cliente es.
 			Account account_1 = new Account("VIN001_manual", localDate,5000.0, client_1);
@@ -54,8 +61,11 @@ public class HombankingApplication {
 			account_1.addTransaction(transaction1);
 			account_1.addTransaction(transaction2);
 
-			// Creo una instancia de la tabla con cliente, pretamos con cantidad y coutas...
+			// Creo una tarjeta
+			LocalDate tiempoSinHs = localDate.toLocalDate();
+			Card tarjeta = new Card("Melba_manual Morel", CardColor.GOLD,CardType.DEBIT, "1111-2222-3333-4444", 123, tiempoSinHs, tiempoSinHs.plusYears(5));
 
+			client_1.addCard(tarjeta);
 
 			// Guardo los valores en la BBDD
 			clientRepository.save(client_1);
@@ -63,6 +73,8 @@ public class HombankingApplication {
 			accountRepository.save(account_2);
 			transactionRepository.save(transaction1);
 			transactionRepository.save(transaction2);
+			cardRepository.save(tarjeta);
+
 		};
 	}
 }

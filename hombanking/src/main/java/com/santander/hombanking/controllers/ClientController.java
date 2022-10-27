@@ -38,6 +38,9 @@ public class ClientController {
         return clientRepository.findById(id).map(ClientDTO::new).orElse(null);
     }
 
-
+    @GetMapping(value = "/clientes/{email}")
+    public ClientDTO getClient(@PathVariable String email){
+        return clientRepository.findByEmail(email).map(ClientDTO::new).orElse(null);
+    }
 
 }

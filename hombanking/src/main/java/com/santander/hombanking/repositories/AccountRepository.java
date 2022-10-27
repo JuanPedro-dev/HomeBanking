@@ -8,15 +8,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
+import java.util.Optional;
 
 @RepositoryRestResource
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Query("SELECT account FROM Account account")
-    List<Account> finAllAccount();
+    List<Account> finAllAccounts_JPQL();
 
     @Query("SELECT account FROM Account account WHERE account.id = ?1")
-    Account findBYId(long id);
+    Optional<Account> findById_JPQL(long id);
 
 
 }

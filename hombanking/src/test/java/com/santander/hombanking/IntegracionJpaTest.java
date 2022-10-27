@@ -33,6 +33,9 @@ public class IntegracionJpaTest {
     @Autowired
     ClienLoanRepository clienLoanRepository;
 
+    @Autowired
+    CardRepository cardRepository;
+
     @Test
     void testFindClientById() {
         Optional<Client> client = clientRepository.findById(1L);
@@ -97,4 +100,18 @@ public class IntegracionJpaTest {
         assertEquals(400000, clientLoan.orElseThrow().getAmount());
         assertEquals(60, clientLoan.orElseThrow().getPayments());
     }
+
+    @Test
+    void testFindAllCard(){
+        List<Card> cards = cardRepository.findAll();
+        assertFalse(cards.isEmpty());
+    }
+
+    @Test
+    void testFindCardById(){
+        Optional<Card> cards = cardRepository.findById(1L);
+        assertTrue(cards.isPresent());
+        assertEquals("Melba Morel", cards.orElseThrow().getCardHolder());
+    }
+
 }
