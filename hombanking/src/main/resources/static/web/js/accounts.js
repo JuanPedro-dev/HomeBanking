@@ -7,15 +7,13 @@ var app = new Vue({
     },
     methods:{
         getData: function(){
-            axios.get("/api/clients/1")
+            axios.get("/api/clients/current")
             .then((response) => {
                 //get client ifo
                 this.clientInfo = response.data;
-                console.log(this.clientInfo);
             })
             .catch((error)=>{
                 // handle error
-                console.log("estoy en el catch");
                 this.errorMsg = "Error getting data";
                 this.errorToats.show();
             })
@@ -31,14 +29,6 @@ var app = new Vue({
                 this.errorToats.show();
             })
         },
-        create: function(){
-            axios.post('http://localhost:8080/api/clients/current/accounts')
-            .then(response => window.location.reload())
-            .catch((error) =>{
-                this.errorMsg = error.response.data;  
-                this.errorToats.show();
-            })
-        }
     },
     mounted: function(){
         this.errorToats = new bootstrap.Toast(document.getElementById('danger-toast'));
