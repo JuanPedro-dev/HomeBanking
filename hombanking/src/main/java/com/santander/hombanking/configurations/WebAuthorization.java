@@ -1,6 +1,7 @@
 package com.santander.hombanking.configurations;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -14,19 +15,22 @@ import javax.servlet.http.HttpSession;
 @EnableWebSecurity
 @Configuration
 public class WebAuthorization extends WebSecurityConfigurerAdapter {
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/admin/**").hasAuthority("ADMIN")
-                .antMatchers("/**").hasAuthority("USER");
+                .antMatchers("/web/js/index.js", "/web/css/**", "/web/index.html", "/web/img/**").permitAll()                    // Permite entrar a todos a la web(Solo al index    )
+                .antMatchers(HttpMethod.POST, "/api/clients").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/clients/**","/api/cards/**", "/api/loans/**", "/api/accounts/**").hasAnyAuthority("CLIENT", "ADMIN")
+                .antMatchers("/api/clients/current/**").hasAnyAuthority("CLIENT", "ADMIN")                                // bloqueda todas las URL /admin, solo entra ADMIN
+                .antMatchers("/api/clients/**","/api/cards/**", "/api/loans/**", "/api/accounts/**").hasAuthority("ADMIN")        // bloqueda todas las URL /admin, solo entra ADMIN
+                .antMatchers("/**").hasAnyAuthority("CLIENT", "ADMIN");                                                           // bloquea todas las URL /**, solo entran los ADMIN
 
         http.formLogin()
-                .usernameParameter("name")
-                .passwordParameter("pwd")
-                .loginPage("/app/login");
+                .usernameParameter("email")             // este es igual a mi bbdd
+                .passwordParameter("password")           // este es igual a mi bbdd
+                .loginPage("/api/login");
 
-        http.logout().logoutUrl("/app/logout");
+        http.logout().logoutUrl("/api/logout");
 
 
 

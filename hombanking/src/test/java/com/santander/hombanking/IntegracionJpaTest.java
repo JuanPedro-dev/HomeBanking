@@ -6,8 +6,11 @@ import com.santander.hombanking.repositories.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 //import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,10 +34,13 @@ public class IntegracionJpaTest {
     LoanRepository loanRepository;
 
     @Autowired
-    ClienLoanRepository clienLoanRepository;
+    ClientLoanRepository clienLoanRepository;
 
     @Autowired
     CardRepository cardRepository;
+
+    @MockBean
+    PasswordEncoder passwordEncoder;
 
     @Test
     void testFindClientById() {
@@ -112,6 +118,27 @@ public class IntegracionJpaTest {
         Optional<Card> cards = cardRepository.findById(1L);
         assertTrue(cards.isPresent());
         assertEquals("Melba Morel", cards.orElseThrow().getCardHolder());
+    }
+
+    @Test
+    void testClientSave(){
+        Client data = new Client("Pepe", "Grillo", "Pepe@gmail.com","123");
+        Client client = clientRepository.save(data);
+
+        assertEquals("Pepe", client.getFirstName());
+        assertEquals("Grillo", client.getLastName());
+        assertEquals("Pepe@gmail.com", client.getEmail());
+        assertEquals("123", client.getPassword());
+    }
+
+    @Test
+    void testAccountSave(){
+        Client client = clientRepository.findById(1l).get();
+        Account account = new Account("VIN005", LocalDateTime.now(), 5000, client);
+
+        assertEquals("VIN005", account.getNumber());
+        assertEquals(5000, account.getBalance());
+        assertEquals("Melba", account.getClient().getFirstName());
     }
 
 }

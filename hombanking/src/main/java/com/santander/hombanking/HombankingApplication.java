@@ -1,10 +1,7 @@
 package com.santander.hombanking;
 
 import com.santander.hombanking.models.*;
-import com.santander.hombanking.repositories.AccountRepository;
-import com.santander.hombanking.repositories.CardRepository;
-import com.santander.hombanking.repositories.ClientRepository;
-import com.santander.hombanking.repositories.TransactionRepository;
+import com.santander.hombanking.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -26,7 +23,7 @@ public class HombankingApplication {
 	PasswordEncoder passwordEncoder;
 
 	@Bean
-	public CommandLineRunner initData(ClientRepository clientRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, CardRepository cardRepository) {
+	public CommandLineRunner initData(ClientRepository clientRepository, AccountRepository accountRepository, TransactionRepository transactionRepository,LoanRepository loanRepository, ClientLoanRepository clientLoanRepository, CardRepository cardRepository) {
 		return (args) -> {
 			/** Modelo de relación:
 				Cliente 1:
@@ -36,22 +33,26 @@ public class HombankingApplication {
 			                         transaccion 2
 			                  cuenta 2
 			 			Tarjetas:
-
-
 			*/
 
-
-			// Creo un cliente
-			Client client_1 = new Client("Melba_manual", "Morel", "melba@mindhub.com", passwordEncoder.encode("clave123"));
+ 			// Creo un cliente
+			Client client_1 = new Client("Melba", "Morel", "melba@mindhub.com", passwordEncoder.encode("1234"));
 
 			// Creo una cuenta, y le digo de qué cliente es.
-			Account account_1 = new Account("VIN001_manual", localDate,5000.0, client_1);
+			Account account_1 = new Account("VIN001", localDate,5000.0, client_1);
 			Account account_2 = new Account("VIN002_manual",localDate.plusDays(1),7500.0, client_1);
 
 			// Un cliente puede tener muchas cuentas (OneToMany), agrego 2 cuentas de prueba
 			client_1.addAccount(account_1);
 			client_1.addAccount(account_2);
 
+			// Creo un prestamo
+			Loan loan = new Loan("Hipotecario", 400);
+			loan.addPayment(30);
+			loan.addPayment(50);
+
+			// Creo el enlace entre cliente y loan
+			ClientLoan clientLoan = new ClientLoan(400000, 60,client_1, loan);
 
 			// Creo transacción (le menciono por clave foranea a qué cuenta pertenece dicha transacción)
 			Transaction transaction1 = new Transaction(TransactionType.DEBIT,"Descripcion_manual 1", localDate,5000, account_1 );
@@ -63,7 +64,7 @@ public class HombankingApplication {
 
 			// Creo una tarjeta
 			LocalDate tiempoSinHs = localDate.toLocalDate();
-			Card tarjeta = new Card("Melba_manual Morel", CardColor.GOLD,CardType.DEBIT, "1111-2222-3333-4444", 123, tiempoSinHs, tiempoSinHs.plusYears(5));
+			Card tarjeta = new Card("Melba Morel", CardColor.GOLD,CardType.DEBIT, "1111-2222-3333-4444", 123, tiempoSinHs, tiempoSinHs.plusYears(5));
 
 			client_1.addCard(tarjeta);
 
@@ -74,6 +75,14 @@ public class HombankingApplication {
 			transactionRepository.save(transaction1);
 			transactionRepository.save(transaction2);
 			cardRepository.save(tarjeta);
+			loanRepository.save(loan);
+			clientLoanRepository.save(clientLoan);
+
+			// Para el admin
+			Client admin = new Client("admin", "admin", "admin@admin", passwordEncoder.encode("admin"));
+			clientRepository.save(admin);
+
+			//////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 

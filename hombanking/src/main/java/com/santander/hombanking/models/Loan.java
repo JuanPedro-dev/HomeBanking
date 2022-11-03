@@ -86,7 +86,7 @@ public class Loan {
     // Ver si agregar el addPayments y addClientLoan
 
      public void addPayment(Integer payment){
-        this.payments.add(payment);
+        payments.add(payment);
     }
 
     public void addClientLoan(ClientLoan clientLoan){
