@@ -13,8 +13,11 @@ import java.util.Optional;
 @RepositoryRestResource
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
+    Optional<Account> findByNumber(String number);
+    List<Account> findByClient(Client client);
+
     @Query("SELECT account FROM Account account")
-    List<Account> finAllAccounts_JPQL();
+    List<Account> findAllAccounts_JPQL();
 
     @Query("SELECT account FROM Account account WHERE account.id = ?1")
     Optional<Account> findById_JPQL(long id);

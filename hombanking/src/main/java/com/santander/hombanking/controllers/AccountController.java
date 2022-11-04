@@ -20,7 +20,7 @@ public class AccountController {
 
     @GetMapping(value = "/accounts")
     public List<AccountDTO> getAccounts(){
-        return accountRepository.finAllAccounts_JPQL().stream().map(AccountDTO::new).collect(toList());
+        return accountRepository.findAllAccounts_JPQL().stream().map(AccountDTO::new).collect(toList());
     }
 
      @GetMapping(value = "/accounts/{id}")

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -36,8 +37,10 @@ public class CardController {
     @PostMapping(value = "/clients/current/accounts")
     public ResponseEntity<Object> createAccount(Authentication authentication){
         Client clientOnSession =  clientRepository.findByEmail(authentication.getName()).orElse(null);
+        assert clientOnSession != null;
+        Set<Account> accounts = clientOnSession.getAccounts();
 
-        if(clientOnSession.getAccounts().size() > 3){
+        if(accounts.size() >= 3){
             return new ResponseEntity<>("Can´t create another card (limited exided)", HttpStatus.FORBIDDEN);
         } else {
 
@@ -65,6 +68,7 @@ public class CardController {
         Client client = clientRepository.findByEmail(authentication.getName()).orElse(null);
 
         // Continuar hacer que si tienen 3 tarjetas de ese tipo no las agregue...
+        assert client != null;
         Set<Card> cards = client.getCards();
 
         int countType = 0;
@@ -98,12 +102,12 @@ public class CardController {
         String tresDigitos = String.format("%0" + 3 + "d", numero);
         int cvv = Integer.parseInt(tresDigitos);
 
-        Account accountToAdd =  new Account(number, LocalDateTime.now(), 0, client);
-
         Card cardToAdd = new Card(client.getFirstName() + " " + client.getLastName(), cardColor, cardType, number, cvv, LocalDate.now(), LocalDate.now().plusYears(5));
 
-        clientRepository.save(client);
+        client.addCard(cardToAdd);
+
         cardRepository.save(cardToAdd);
+        clientRepository.save(client);
 
         return new ResponseEntity<>("Created card sucessfuly.", HttpStatus.CREATED);
 

@@ -45,6 +45,7 @@ public class Transaction {
         this.description = description;
         this.date = date;
         this.amount = amount;
+//        account.addTransaction(this);
         this.account = account;
     }
 

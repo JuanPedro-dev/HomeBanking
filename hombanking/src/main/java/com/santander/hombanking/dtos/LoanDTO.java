@@ -14,7 +14,7 @@ public class LoanDTO {
     private String name;
     private double amount;
     private List<Integer> payments = new ArrayList<>();
-   private Set<ClientLoanDTO> clientLoanDTOS = new HashSet<>();
+    private Set<ClientLoanDTO> clientLoanDTOS = new HashSet<>();
 
     // Constructor
     public LoanDTO() {
