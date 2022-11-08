@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @SpringBootApplication
+
 public class HombankingApplication {
 
 	public static void main(String[] args) {
@@ -47,7 +48,7 @@ public class HombankingApplication {
 			client_1.addAccount(account_2);
 
 			// Creo un prestamo
-			Loan loan = new Loan("Hipotecario", 400);
+			Loan loan = new Loan("Hipotecario", 4000);
 			loan.addPayment(30);
 			loan.addPayment(50);
 

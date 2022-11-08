@@ -17,10 +17,8 @@ import static java.util.stream.Collectors.toList;
 @RestController
 @RequestMapping(value = "/api")
 public class TransactionController {
-
     @Autowired
     TransactionRepository transactionRepository;
-
     @Autowired
     TransactionService transactionService;
 
@@ -42,9 +40,12 @@ public class TransactionController {
                                                   @RequestParam String description,
                                                   Authentication authentication){
 
-        // Mejorar con una tabla de properties, en el servicio guardar por codigo cada respuestas... 
+        String message = transactionService.verifyTransactions(fromAccountNumber, toAccountNumber, amount, description, authentication);
 
-        return transactionService.verifyTransactions(fromAccountNumber, toAccountNumber, amount, description, authentication);
+        if(message.equals("success")){
+            return new ResponseEntity<>(message, HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
     }
 
 

@@ -4,6 +4,7 @@ import com.santander.hombanking.models.*;
 import com.santander.hombanking.repositories.AccountRepository;
 import com.santander.hombanking.repositories.CardRepository;
 import com.santander.hombanking.repositories.ClientRepository;
+import com.santander.hombanking.utils.CardUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,17 +21,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-
 @RestController
 @RequestMapping(value = "/api")
 public class CardController {
-
     @Autowired
     ClientRepository clientRepository;
-
     @Autowired
     AccountRepository accountRepository;
-
     @Autowired
     CardRepository cardRepository;
 
@@ -43,7 +40,6 @@ public class CardController {
         if(accounts.size() >= 3){
             return new ResponseEntity<>("Can´t create another card (limited exided)", HttpStatus.FORBIDDEN);
         } else {
-
             // Creo una cuenta
 //            int numero = new Random().nextInt(100000000);
             int numero = (int)(Math.random()*(-99999999 +1)+99999999);
@@ -57,7 +53,6 @@ public class CardController {
             clientRepository.save(clientOnSession);
             accountRepository.save(accountToAdd);
         }
-
         return new ResponseEntity<>("Account created sucessfuly.", HttpStatus.CREATED);
     }
 
@@ -82,28 +77,12 @@ public class CardController {
             return new ResponseEntity<>("Cant create more cards (limited exided)", HttpStatus.FORBIDDEN);
         }
 
-        // Creo un numero para la cuenta: 3333-XXXX-XXXX-XXXX
-//        int numero = (int)(Math.random()*(-99999999 +1)+99999999); // Opcion 2 para crear un número random
-        int numero = new Random().nextInt(10000);
-        String digitos4Generados = String.format("%0" + 4 + "d", numero);
-        String number = "3333-"+ digitos4Generados;
+        String number = CardUtils.getCardNumber();
 
-        numero = new Random().nextInt(10000);
-        digitos4Generados = String.format("%0" + 4 + "d", numero);
-        number += "-"+ digitos4Generados;
+        int cvv = CardUtils.getCvv();
 
-        numero = new Random().nextInt(10000);
-        digitos4Generados = String.format("%0" + 4 + "d", numero);
-        number += "-"+ digitos4Generados;
-
-        // Creo un numero para la cuenta: 3333-XXXX-XXXX-XXXX
-//        int numero = (int)(Math.random()*(-99999999 +1)+99999999); // Opcion 2 para crear un número random
-        numero = new Random().nextInt(1000);
-        String tresDigitos = String.format("%0" + 3 + "d", numero);
-        int cvv = Integer.parseInt(tresDigitos);
-
-        Card cardToAdd = new Card(client.getFirstName() + " " + client.getLastName(), cardColor, cardType, number, cvv, LocalDate.now(), LocalDate.now().plusYears(5));
-
+        Card cardToAdd = new Card(client.getFirstName() + " " + client.getLastName(),
+                cardColor, cardType, number, cvv, LocalDate.now(), LocalDate.now().plusYears(5));
         client.addCard(cardToAdd);
 
         cardRepository.save(cardToAdd);
@@ -112,4 +91,8 @@ public class CardController {
         return new ResponseEntity<>("Created card sucessfuly.", HttpStatus.CREATED);
 
     }
+
+
+
+
 }

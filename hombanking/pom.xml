@@ -19,8 +19,15 @@
 	<dependencies>
 <!--		Aca agrego los contrains-->
 
+<!--		aca agrego el formato xml-->
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>2.12.3</version>
+		</dependency>
 
-<!--		Aca agrego la seguridad-->
+		<!--		Aca agrego la seguridad-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>

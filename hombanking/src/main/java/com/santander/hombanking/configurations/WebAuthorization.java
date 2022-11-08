@@ -22,6 +22,7 @@ public class WebAuthorization extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/clients").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/clients/**","/api/cards/**", "/api/loans/**", "/api/accounts/**").hasAnyAuthority("CLIENT", "ADMIN")
                 .antMatchers("/api/clients/current/**").hasAnyAuthority("CLIENT", "ADMIN")                                // bloqueda todas las URL /admin, solo entra ADMIN
+                .antMatchers(HttpMethod.GET, "/api/loans/**").hasAnyAuthority("CLIENT", "ADMIN")                                // bloqueda todas las URL /admin, solo entra ADMIN
                 .antMatchers("/api/clients/**","/api/cards/**", "/api/loans/**", "/api/accounts/**").hasAuthority("ADMIN")        // bloqueda todas las URL /admin, solo entra ADMIN
                 .antMatchers("/**").hasAnyAuthority("CLIENT", "ADMIN");                                                           // bloquea todas las URL /**, solo entran los ADMIN
 
@@ -30,9 +31,10 @@ public class WebAuthorization extends WebSecurityConfigurerAdapter {
                 .passwordParameter("password")           // este es igual a mi bbdd
                 .loginPage("/api/login");
 
+        // para que se logue maximo uno y no deje a otros...
+        http.sessionManagement().maximumSessions(1).maxSessionsPreventsLogin(true);
+
         http.logout().logoutUrl("/api/logout");
-
-
 
          // turn off checking for CSRF tokens
         http.csrf().disable();
@@ -51,7 +53,6 @@ public class WebAuthorization extends WebSecurityConfigurerAdapter {
 
         // if logout is successful, just send a success response
         http.logout().logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler());
-
     }
 
     private void clearAuthenticationAttributes(HttpServletRequest request) {
@@ -60,6 +61,5 @@ public class WebAuthorization extends WebSecurityConfigurerAdapter {
             session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
         }
     }
-
 
 }

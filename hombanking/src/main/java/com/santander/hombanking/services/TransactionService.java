@@ -9,6 +9,8 @@ import com.santander.hombanking.repositories.AccountRepository;
 import com.santander.hombanking.repositories.ClientRepository;
 import com.santander.hombanking.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -27,15 +30,15 @@ public class TransactionService {
 
     @Autowired
     AccountRepository accountRepository;
-
     @Autowired
     ClientRepository clientRepository;
-
     @Autowired
     TransactionRepository transactionRepository;
+    @Autowired
+    MessageSource messageSource;
 
 //        Debe recibir el monto, la descripción, número de cuenta de origen y número de cuenta de destino como parámetros de solicitud
-    public ResponseEntity<Object> verifyTransactions(@RequestParam String fromAccountNumber,
+    public String verifyTransactions(@RequestParam String fromAccountNumber,
                                                      @RequestParam String toAccountNumber,
                                                      @RequestParam double amount,
                                                      @RequestParam String description,
@@ -43,22 +46,29 @@ public class TransactionService {
     ){
 
 //        Verificar que los parámetros no estén vacíos
+        String message = messageSource.getMessage( "fromAccount.validation.isempty", null, LocaleContextHolder.getLocale());
+
         if(fromAccountNumber.isEmpty()){
-            return new ResponseEntity<>("Account origin is empty", HttpStatus.FORBIDDEN);
+//            return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
+            return message;
         }
         if(toAccountNumber.isEmpty()){
-            return new ResponseEntity<>("Account destination is empty", HttpStatus.FORBIDDEN);
+            message = messageSource.getMessage( "toAccount.validation.isempty", null, LocaleContextHolder.getLocale());
+            return message;
         }
         if(amount < 0){
-            return new ResponseEntity<>("Amount can´t be negative", HttpStatus.FORBIDDEN);
+            message = messageSource.getMessage( "amount.validation.isPositive", null, LocaleContextHolder.getLocale());
+            return message;
         }
         if(description.isEmpty()){
-            return new ResponseEntity<>("Description is empty", HttpStatus.FORBIDDEN);
+            message = messageSource.getMessage( "description.validation.isEmpty", null, LocaleContextHolder.getLocale());
+            return message;
         }
 
 //        Verificar que los números de cuenta no sean iguales
         if(fromAccountNumber.equals(toAccountNumber)){
-            return new ResponseEntity<>("You can't transfer yourself", HttpStatus.FORBIDDEN);
+            message = messageSource.getMessage( "fromAccountNumber.equals.toAccountNumber", null, LocaleContextHolder.getLocale());
+            return message;
         }
 
 //        Verificar que exista la cuenta de origen
@@ -66,31 +76,36 @@ public class TransactionService {
         Account fromAccount = accountRepository.findByNumber(fromAccountNumber).orElse(null);
 
         if(fromAccount == null){
-            return new ResponseEntity<>("Account origin doesn`t existe", HttpStatus.FORBIDDEN);
+            message = messageSource.getMessage( "fromAccount.valite.exist", null, LocaleContextHolder.getLocale());
+            return message;
         }
 
 //        Verificar que la cuenta de origen pertenezca al cliente autenticado
         List<Account> accountsCurrent = accountRepository.findByClient(currentClient);
 
         if(accountsCurrent == null){
-            return new ResponseEntity<>("The current client does´t have an account", HttpStatus.FORBIDDEN);
+            message = messageSource.getMessage( "client.validate.account.exist", null, LocaleContextHolder.getLocale());
+            return message;
         }
 
-        List<Account> accountCurrent =  accountsCurrent.stream().filter(account -> !(account.getNumber().equals(fromAccountNumber))).collect(toList());
+        List<Account> accountCurrent =  accountsCurrent.stream().filter(account -> (account.getNumber().equals(fromAccountNumber))).collect(toList());
 
         if(accountCurrent.size() == 0){
-            return new ResponseEntity<>("This account dont belong to the current client", HttpStatus.FORBIDDEN);
+            message = messageSource.getMessage( "client.validate.account.equals.client", null, LocaleContextHolder.getLocale());
+            return message;
         }
 
 //        Verificar que exista la cuenta de destino
         Account toAccount = accountRepository.findByNumber(toAccountNumber).orElse(null);
         if( toAccount == null){
-            return new ResponseEntity<>("Account destiny does´t exist", HttpStatus.FORBIDDEN);
+            message = messageSource.getMessage( "toAccount.valida.exist", null, LocaleContextHolder.getLocale());
+            return message;
         }
 
 //        Verificar que la cuenta de origen tenga el monto disponible.
         if(fromAccount.getBalance() < amount){
-            return new ResponseEntity<>("Account origin don`t have enough money", HttpStatus.FORBIDDEN);
+            message = messageSource.getMessage( "fromAccount.validate.limit", null, LocaleContextHolder.getLocale());
+            return message;
         }
 
 
@@ -112,11 +127,11 @@ public class TransactionService {
 
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
-
         transactionRepository.save(transactionOrigin);
         transactionRepository.save(transactionDestiny);
 
-        return new ResponseEntity<>("Éxito", HttpStatus.CREATED);
+        message = messageSource.getMessage( "success", null, LocaleContextHolder.getLocale());
+        return message;
     }
 
 

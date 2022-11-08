@@ -66,15 +66,10 @@ public class ClientController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+
     @RequestMapping("/clients/current")
     public ClientDTO getClientCurrent(Authentication authentication){
         return clientRepository.findByEmail(authentication.getName()).map(ClientDTO::new).orElse(null);
     }
-    @GetMapping(value = "/clients/current/accounts")
-    public Set<AccountDTO> getAccount(Authentication authentication){
-        Client client = clientRepository.findByEmail(authentication.getName()).orElse(null);
-        return client.getAccounts().stream().map(AccountDTO::new).collect(Collectors.toSet());
-    }
-
 
 }
